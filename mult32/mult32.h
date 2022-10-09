@@ -405,7 +405,7 @@ static void Mult32_init(void) {
 
 static uint32_t Mult32(const void* in, const size_t len, const uint64_t seed) {
     /* Force Mult32_init() to happen before anything else,
-     * st a cost of one test for every hash call.
+     * at a cost of one test for every hash call.
      * Alternatively, remove this test and call Mult32_init()
      * at the beginning of your program.
      */
