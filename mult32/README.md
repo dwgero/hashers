@@ -7,4 +7,5 @@ strings of length greater than or equal to 64 bytes, as measured
 against other 32-bit hashers meeting those specifications that are
 documented in SMHasher3.<br>
 For input strings of length less than 64 bytes, Komi32 is faster.<br>
-Average bulk speed tests of Mult32 in SMHasher3 are 7.7 to 8.2 bytes/cycle.
+Average bulk speed tests of Mult32 in SMHasher3 are 7.7 to 8.2 bytes/cycle
+on a 2.6 Ghz processor in a system from 2016.
