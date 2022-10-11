@@ -128,8 +128,9 @@
 #include "komi32.h"
 
 static uint32_t Combo32(const void * in, const size_t len, const uint64_t seed) {
-    if (likely(len < 64))
+    if (likely(len < 64)) {
         return Komi32(in, len, seed);
+    }
     return Mult32(in, len, seed);
 }
 
