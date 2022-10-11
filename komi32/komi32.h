@@ -368,4 +368,6 @@ static uint32_t Komi32(const void * in, const size_t len, const uint64_t seed) {
     return Komi32_impl(in, len, seed);
 }
 
+#undef GET_U32
+
 #endif /* KOMI32_H */
