@@ -36,6 +36,7 @@
 
 #ifndef COMPILER_DEFS
 #define COMPILER_DEFS 1
+
 /* comment out the next line if you want the oppposite
  * endianness of the native processor
  */
