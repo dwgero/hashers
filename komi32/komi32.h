@@ -170,7 +170,9 @@
  * @param fb Final byte used for padding.
  */
 /* Can be called with MsgLen == 0 to 3 */
-static inline uint32_t final_bytes(const uint8_t * const Msg, const size_t MsgLen, uint32_t fb) {
+static inline uint32_t komi32_final_bytes(const uint8_t * const Msg,
+                                          const size_t MsgLen,
+                                          uint32_t fb) {
     uint32_t m = 0;
 
     memcpy(&m, Msg, MsgLen);
@@ -225,11 +227,13 @@ static inline uint32_t final_bytes(const uint8_t * const Msg, const size_t MsgLe
 /* Seed hashing round with 4-byte input, using the "r1l" and "r1h"
  * temporary variables.
  */
+#ifndef KOMI32_SEEDHASH4
 #define KOMI32_SEEDHASH4(x)                                   \
     kh_m64(Seed1 ^ ((x) & UINT32_C(0x55555555)),              \
            Seed5 ^ ((x) & UINT32_C(0xAAAAAAAA)), &r1l, &r1h); \
     Seed5 += r1h;                                             \
-    Seed1 = Seed5 ^ r1l;   
+    Seed1 = Seed5 ^ r1l;
+#endif
 
 /* Handle reading final 0 to 7 bytes */
 #define KOMI32_FINALIZE() do { \
@@ -244,13 +248,13 @@ static inline uint32_t final_bytes(const uint8_t * const Msg, const size_t MsgLe
         case 5: \
         case 4: \
             Seed1 ^= GET_U32(Msg, 0); \
-            Seed5 ^= final_bytes(Msg + 4, MsgLen - 4, fb); \
+            Seed5 ^= komi32_final_bytes(Msg + 4, MsgLen - 4, fb); \
             break; \
         case 3: \
         case 2: \
         case 1: \
         case 0: \
-            Seed1 ^= final_bytes(Msg, MsgLen, fb); \
+            Seed1 ^= komi32_final_bytes(Msg, MsgLen, fb); \
     } \
 \
     KOMI32_HASHROUND(); \
