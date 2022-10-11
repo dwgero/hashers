@@ -266,16 +266,16 @@ static inline uint32_t komi32_final_bytes(const uint8_t * const Msg,
 /* KOMI32 hash function */
 
 /*
- * @param Msg0 The message to produce a hash from. The alignment of this
+ * @param in The message to produce a hash from. The alignment of this
  * pointer is unimportant.
- * @param MsgLen Message's length, in bytes.
+ * @param len Message's length, in bytes.
  * @param UseSeed Optional value, to use instead of the default seed. To use
  * the default seed, set to 0. The UseSeed value can have any bit length and
  * statistical quality, and is used only as an additional entropy source. May
  * need endianness-correction if this value is shared between big- and
  * little-endian systems.
  */
-static inline uint32_t Komi32_impl(const void * const in, const size_t len, const uint64_t UseSeed) {
+static inline uint32_t Komi32_impl(const void * const in, const size_t len, uint64_t UseSeed) {
     /* Allow the compiler to put Msg in a register */
     const uint8_t* Msg = (const uint8_t*)in;
     /* Allow the compiler to put MsgLen in a register */
@@ -286,8 +286,9 @@ static inline uint32_t Komi32_impl(const void * const in, const size_t len, cons
     uint32_t Seed1 = UINT32_C(0xC5A308D3);
     uint32_t Seed5 = UINT32_C(0xB8D01377);
 
-    KOMI32_SEEDHASH4((uint32_t) (UseSeed ^ MsgLen));
-    KOMI32_SEEDHASH4((uint32_t)((UseSeed ^ MsgLen) >> 32));
+    UseSeed ^= MsgLen;
+    KOMI32_SEEDHASH4((uint32_t) UseSeed);
+    KOMI32_SEEDHASH4((uint32_t)(UseSeed >> 32));
 
     if (unlikely(MsgLen == 0)) {
         KOMI32_HASHROUND();
