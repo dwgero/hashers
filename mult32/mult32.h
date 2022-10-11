@@ -257,7 +257,7 @@ static inline uint64_t mult32_m64(const uint32_t m1, const uint64_t m2) {
 
 /* Handle reading final 0 to 7 bytes */
 #define MULT32_FINALIZE(msg,len,i) do { \
-    const uint64_t final = final_bytes(msg, len); \
+    const uint64_t final = mult32_final_bytes(msg, len); \
 \
     MULT32_VALHASH8(final, i); \
 } while (0)
