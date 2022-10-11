@@ -1,5 +1,5 @@
 /*
- * Mult32 version 1.4
+ * Mult32 version 1.5
  * Copyright (c) 2022 David W. Gero
  *
  * This file is free software: you can redistribute it and/or
@@ -142,7 +142,8 @@ static uint64_t mult32_random[RANDOM_LENGTH];
  * This is the only part of the algorithm where it matters
  * if the processor is little-endian or big-endian
  */
-static inline uint64_t final_bytes(const uint64_t* const Msg, const size_t MsgLen) {
+static inline uint64_t mult32_final_bytes(const uint64_t* const Msg,
+                                          const size_t MsgLen) {
     #if defined(LITTLE_ENDIAN)
         /* A modified version of 0xDEADBEEFDEADBEEF */
         uint64_t m = UINT64_C(0xDCADBCEDDCADBCED);
@@ -244,6 +245,7 @@ static inline uint64_t mult32_m64(const uint32_t m1, const uint64_t m2) {
  * 32-bit implementation derived from Aleksey Vaneev's komihash
  * random number generator.
  */
+#ifndef KOMI32_SEEDHASH4
 #define KOMI32_SEEDHASH4(x) do { \
     uint64_t prod = mult32_m64(Seed1 ^ ((x) & UINT32_C(0x55555555)), \
                                Seed5 ^ ((x) & UINT32_C(0xAAAAAAAA))); \
@@ -251,6 +253,7 @@ static inline uint64_t mult32_m64(const uint32_t m1, const uint64_t m2) {
     Seed5 += (uint32_t)(prod >> 32); \
     Seed1  = Seed5 ^ (uint32_t)prod; \
 } while (0);
+#endif
 
 /* Handle reading final 0 to 7 bytes */
 #define MULT32_FINALIZE(msg,len,i) do { \
