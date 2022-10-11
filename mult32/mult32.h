@@ -1,5 +1,5 @@
 /*
- * Mult32 version 1.3
+ * Mult32 version 1.4
  * Copyright (c) 2022 David W. Gero
  *
  * This file is free software: you can redistribute it and/or
@@ -34,6 +34,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifndef COMPILER_DEFS
+#define COMPILER_DEFS 1
 /* comment out the next line if you want the oppposite
  * endianness of the native processor
  */
@@ -122,6 +124,8 @@
     */
   #endif /* BSWAP64 choices */
 #endif /* !defined(NO_SWAP) */
+
+#endif /* COMPILER_DEFS */
 
 /* RANDOM_POWER must be a power of 2 */
 #define RANDOM_POWER 128
