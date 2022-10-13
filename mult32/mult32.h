@@ -177,13 +177,11 @@ static inline uint64_t mult32_m64(const uint32_t m1, const uint64_t m2) {
 }
 
 /* Hashing round reading 8-byte input.
- * My experiments did not find a faster hashing round that is portable,
- * uses no CPU-specific instructions, and passes all SMHasher3 tests.
  * Cost:
  *   1 possibly unaligned 64-bit memory read
  *   1 aligned 64-bit array read
  *   2 post-increments
- *   2 exclusive-ors
+ *   2 64-bit exclusive-ors
  *   1 right shift by a constant 32
  *   1 32-bit by 32-bit multiply with 64-bit result
  */
