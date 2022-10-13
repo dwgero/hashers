@@ -129,7 +129,7 @@
 
 static uint32_t Combo32(const void * in, const size_t len, const uint64_t seed) {
     /* Adjust this depending on the relative speeds of your system */
-    if (likely(len < 64)) {
+    if (likely(len < 32)) {
         return Komi32(in, len, seed);
     }
     return Mult32(in, len, seed);
