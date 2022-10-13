@@ -1,5 +1,5 @@
 /*
- * Mult32 version 1.5
+ * Mult32 version 1.6
  * Copyright (c) 2022 David W. Gero
  *
  * This file is free software: you can redistribute it and/or
@@ -265,19 +265,24 @@ static inline uint64_t mult32_m64(const uint32_t m1, const uint64_t m2) {
 /* Mult32 hash function */
 
 static inline uint32_t Mult32_impl(const void* const in, const size_t len, const uint64_t UseSeed) {
+    uint64_t i = ((len >> 6) ^ len) & (RANDOM_POWER - 1);
+    const uint64_t* Msg;
+    uint64_t MsgLen;
+    uint64_t hash;
+
+    prefetch(mult32_random + i);
+    prefetch(in);
+
     /* Allow the compiler to put Msg in a register */
-    const uint64_t* Msg = (const uint64_t*)in;
+    Msg = (const uint64_t*)in;
     /* Allow the compiler to put MsgLen in a register */
-    uint64_t MsgLen = (uint64_t)len;
-    uint64_t hash = UseSeed ^ MsgLen;
-    uint64_t i = ((MsgLen >> 6) ^ MsgLen) & (RANDOM_POWER - 1);
-    
+    MsgLen = (uint64_t)len;
+    hash = UseSeed ^ MsgLen;
+
     /* Guaranteed to start with i < RANDOM_POWER */
     MULT32_VALHASH8(hash, i); /* now i < RANDOM_POWER + 1 */
     
     while (likely(MsgLen >= 64)) {
-        prefetch(Msg);
-        
         MULT32_HASH8(Msg, i); /* now i < RANDDOM_POWER + 2 */
         MULT32_HASH8(Msg, i); /* + 3 */
         MULT32_HASH8(Msg, i); /* + 4 */
@@ -286,6 +291,14 @@ static inline uint32_t Mult32_impl(const void* const in, const size_t len, const
         MULT32_HASH8(Msg, i); /* + 7 */
         MULT32_HASH8(Msg, i); /* + 8 */
         MULT32_HASH8(Msg, i); /* + 9 */
+
+        /* Every 16 rounds, the following line prefetches the
+         * wrong thing, but moving the change to i here slows
+         * everything down, for some reason.
+         */
+        prefetch(mult32_random + i);
+        prefetch(Msg);
+
         MULT32_HASHROUND(i);  /* now i < RANDOM_POWER + 10, so the
                                * i used by MULT32_HASHROUND
                                * was < RANDOM_POWER + 9, which
@@ -297,8 +310,6 @@ static inline uint32_t Mult32_impl(const void* const in, const size_t len, const
     }
     
     /* MsgLen == 0 to 63 */
-    
-    prefetch(Msg);
     
     {
         uint8_t numHash8 = (MsgLen >> 3) & 7;
