@@ -299,6 +299,8 @@ static inline uint32_t Komi32_impl(const void * const in, const size_t len, uint
 
     /* From here on, Msg[MsgLen - 1] is always valid */
 
+    prefetch(Msg);
+
     if (likely(MsgLen >= 32)) {
         uint32_t Seed2 = UINT32_C(0x03707344) ^ Seed1;
         uint32_t Seed3 = UINT32_C(0x299F31D0) ^ Seed1;
@@ -309,8 +311,6 @@ static inline uint32_t Komi32_impl(const void * const in, const size_t len, uint
         uint32_t r3l, r3h, r4l, r4h;
 
         do {
-            prefetch(Msg);
-
             /* The "shifting" arrangement below does not increase
              * individual SeedN's PRNG period beyond 2^32, but reduces a
              * chance of any occassional synchronization between PRNG lanes
@@ -332,11 +332,13 @@ static inline uint32_t Komi32_impl(const void * const in, const size_t len, uint
             Seed7 += r3h;
             kh_m64(Seed4 ^ GET_U32(Msg, 24),
                    Seed8 ^ GET_U32(Msg, 28), &r4l, &r4h);
-            Seed4  = Seed7 ^ r4l;
-            Seed8 += r4h;
-            Seed1  = Seed8 ^ r1l;
-
+          
             Msg    += 32;
+            prefetch(Msg);
+          
+            Seed4   = Seed7 ^ r4l;
+            Seed8  += r4h;
+            Seed1   = Seed8 ^ r1l;
             MsgLen -= 32;
         } while (likely(MsgLen >= 32));
 
@@ -345,8 +347,6 @@ static inline uint32_t Komi32_impl(const void * const in, const size_t len, uint
     }
 
     /* MsgLen == 0 to 31 */
-
-    prefetch(Msg);
 
     {
         uint8_t numHash8 = (MsgLen >> 3) & 3;
